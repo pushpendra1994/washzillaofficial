@@ -861,6 +861,18 @@ figcaption {
   display: grid;
   gap: 16px;
   padding: 28px;
+  transition: box-shadow 0.4s ease, transform 0.4s ease;
+}
+
+.booking-form--focus {
+  animation: bookingFocusPulse 2.2s ease;
+  box-shadow: 0 0 0 2px var(--gold-bright), 0 24px 60px rgba(212, 175, 55, 0.35);
+}
+
+@keyframes bookingFocusPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(255, 216, 107, 0.0); }
+  20%  { box-shadow: 0 0 0 4px rgba(255, 216, 107, 0.55), 0 24px 70px rgba(212, 175, 55, 0.45); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 216, 107, 0.0); }
 }
 
 label {
