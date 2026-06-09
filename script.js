@@ -169,7 +169,10 @@ document.querySelectorAll(".site-nav a").forEach((link) => {
 });
 
 const dateInput = document.querySelector("#date");
-const today = new Date().toISOString().split("T")[0];
+const OPENING_DATE = "2026-07-12"; // WashZilla grand opening date
+const todayIso = new Date().toISOString().split("T")[0];
+// Bookings can never be earlier than the opening date.
+const today = todayIso > OPENING_DATE ? todayIso : OPENING_DATE;
 dateInput.min = today;
 dateInput.value = today;
 
