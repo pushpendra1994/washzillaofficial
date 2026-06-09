@@ -103,37 +103,53 @@ const buildWhatsAppMessage = ({
       `(WashZilla, Near Tiya Vani Multispeciality Hospital, IIIT CAP. Dhyan Chandra Chowraha, SJ Academy Gali, Prayagraj – 211015)`
   );
 
+// Helper: scroll to booking form, focus first field, optionally prefill notes.
+const focusBookingForm = (prefilledNote) => {
+  const form = document.querySelector("#booking-form");
+  if (!form) return;
+  form.scrollIntoView({ behavior: "smooth", block: "start" });
+  // Brief highlight so the user notices we jumped there.
+  form.classList.add("booking-form--focus");
+  setTimeout(() => form.classList.remove("booking-form--focus"), 2200);
+  if (prefilledNote) {
+    const notesField = document.querySelector("#notes");
+    if (notesField && !notesField.value) {
+      notesField.value = prefilledNote;
+    }
+  }
+  setTimeout(() => {
+    const nameField = document.querySelector("#customer-name");
+    if (nameField && !nameField.value) nameField.focus();
+  }, 600);
+};
+
+// Q&A WhatsApp buttons keep their direct behavior. Booking buttons funnel
+// through the form so we can save to Supabase + Google Sheets first.
 document.querySelectorAll("[data-whatsapp]").forEach((link) => {
-  link.href = whatsAppUrl();
+  if (link.dataset.intent === "qa") {
+    // Keep direct WhatsApp link for general questions.
+    link.href = whatsAppUrl();
+    return;
+  }
+  // Booking-intent button → scroll to form instead of opening WhatsApp.
+  link.href = "#booking";
+  link.addEventListener("click", (event) => {
+    event.preventDefault();
+    focusBookingForm();
+  });
 });
 
 document.querySelectorAll("[data-service]").forEach((link) => {
   link.addEventListener("click", (event) => {
     event.preventDefault();
-    const service = link.dataset.service;
-    const message = encodeURIComponent(
-      `Hello WashZilla, I want to book ${service}.\n\n` +
-        `Full Name:\nMobile Number:\nVehicle Category (Hatchback/Sedan or SUV/MUV):\n` +
-        `Pickup & Drop (3 KM FREE / 5 KM ₹30 / 15 KM ₹100):\n` +
-        `Pickup Address:\nPreferred Date:\nPreferred Time:\nNotes:\n\n` +
-        `Please confirm availability.\n\n` +
-        `(WashZilla, Near Tiya Vani Multispeciality Hospital, IIIT CAP. Dhyan Chandra Chowraha, SJ Academy Gali, Prayagraj – 211015)`
-    );
-    window.open(whatsAppUrl(message), "_blank", "noopener");
+    focusBookingForm(`Service requested: ${link.dataset.service}`);
   });
 });
 
 document.querySelectorAll("[data-plan]").forEach((link) => {
   link.addEventListener("click", (event) => {
     event.preventDefault();
-    const plan = link.dataset.plan;
-    const message = encodeURIComponent(
-      `Hello WashZilla, I am interested in the ${plan}.\n\n` +
-        `Full Name:\nMobile Number:\nVehicle Category (Hatchback/Sedan or SUV/MUV):\n` +
-        `Please share full plan details and availability.\n\n` +
-        `(WashZilla, Near Tiya Vani Multispeciality Hospital, IIIT CAP. Dhyan Chandra Chowraha, SJ Academy Gali, Prayagraj – 211015)`
-    );
-    window.open(whatsAppUrl(message), "_blank", "noopener");
+    focusBookingForm(`Plan interest: ${link.dataset.plan}`);
   });
 });
 
